@@ -7,7 +7,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ouinon0/psitransfer-admin-fullaccess
 
 jobs:
   build-and-push:
@@ -21,6 +20,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # GHCR image names must be lowercase and must live under the repository
+      # owner's namespace. Derive it from the repo so a rename of the account
+      # (or a transfer) never breaks the push again.
+      - name: Compute image name
+        id: img
+        run: echo "name=${REGISTRY}/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -40,5 +46,5 @@ jobs:
           provenance: false
           sbom: false
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ steps.img.outputs.name }}:latest
+            ${{ steps.img.outputs.name }}:${{ github.sha }}
