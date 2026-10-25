@@ -35,11 +35,23 @@
               @keydown.space.prevent='generatePassword()'
             )
               icon(name="key")
+        div
+          label(for='email') {{ $root.lang.email }}
+          .input-group
+            span.input-group-addon
+              icon(name="envelope")
+            input#email.form-control(
+              type='email'
+              :value='email'
+              @input="$store.commit('upload/EMAIL', $event.target.value)"
+              :disabled='disabled'
+            )
 </template>
 
 <script type="text/babel">
   import { mapState } from 'vuex';
   import 'vue-awesome/icons/key';
+  import 'vue-awesome/icons/envelope';
 
   const passGen = {
     _pattern: /[A-Z0-9_\-+!]/,
@@ -76,6 +88,7 @@
       disabled: 'disabled',
       retention: state => state.upload.retention,
       password: state => state.upload.password,
+      email: state => state.upload.email,
     }),
 
     methods: {
